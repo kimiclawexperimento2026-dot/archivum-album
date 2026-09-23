@@ -44,14 +44,14 @@ export const metadata: Metadata = {
     title: "ARCHIVUM — The Creature Archive",
     description:
       "Every mythology on Earth kept the same files. We catalogued them. Breach the packs.",
-    images: [{ url: "/emblem.png", width: 1200, height: 630, alt: "ARCHIVUM seal" }],
+    images: [{ url: "/emblem.svg", width: 1200, height: 630, alt: "ARCHIVUM seal" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "ARCHIVUM — The Creature Archive",
     description:
       "13 creatures from world mythologies, each backed by real science. Breach the packs.",
-    images: ["/emblem.png"],
+    images: ["/emblem.svg"],
   },
   robots: { index: true, follow: true },
   manifest: "/manifest.json",
