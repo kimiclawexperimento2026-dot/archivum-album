@@ -90,6 +90,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 ALBUM
               </Link>
               <Link
+                href="/creatures"
+                className="font-mono text-[10px] tracking-dossier text-ash transition-colors hover:text-bone"
+              >
+                FILES
+              </Link>
+              <Link
                 href="/presale"
                 className="font-mono text-[10px] tracking-dossier text-gold transition-colors hover:text-bone"
               >
