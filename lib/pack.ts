@@ -10,8 +10,10 @@ function secureRandom(): number {
   return buf[0] / 4294967296;
 }
 
-function rollRarity(): Rarity {
-  const r = secureRandom();
+type Rng = () => number;
+
+function rollRarity(rng: Rng): Rarity {
+  const r = rng();
   let acc = 0;
   for (const tier of RARITY_ORDER) {
     acc += ODDS[tier];
@@ -35,7 +37,7 @@ export interface PackResult {
   newLegendary: boolean;
 }
 
-export function openPack(ctx: DrawContext): PackResult {
+export function openPack(ctx: DrawContext, rng: Rng = secureRandom): PackResult {
   const cards: Card[] = [];
   const seen = new Set<string>();
   let forcedLegendary = ctx.pityLegendary + 1 >= PITY.legendaryEvery;
@@ -44,7 +46,7 @@ export function openPack(ctx: DrawContext): PackResult {
   let newEpicPlus = false;
 
   for (let i = 0; i < 5; i++) {
-    let rarity = rollRarity();
+    let rarity = rollRarity(rng);
 
     if (i === 4 && forcedLegendary) rarity = "legendary";
     else if (i === 4 && forcedEpic) {

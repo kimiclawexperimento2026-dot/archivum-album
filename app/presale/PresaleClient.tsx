@@ -8,10 +8,15 @@ import {
   signTransaction,
 } from "@stellar/freighter-api";
 
-const HORIZON = "https://horizon-testnet.stellar.org";
-const NETWORK_PASSPHRASE = "Test SDF Network ; September 2015";
-const PRESALE_ADDR = "GCU72VRE26KQGSO7BXDGUWPL3JNP7CZ6HV7EELULALURHJGSHJBT4XQU";
-const ISSUER = "GDCCEQKHW2SWHOMP4MZSB3DIWSSF7CFUL6JKCTHTY2AO4MWHLLYBDAMR";
+import {
+  ASSET_CODE,
+  DISTRIBUTION,
+  HORIZON,
+  ISSUER,
+  NETWORK_PASSPHRASE,
+} from "../../lib/archivum";
+
+const PRESALE_ADDR = DISTRIBUTION;
 const RATE = 500; // ARCH por XLM (testnet)
 const MIN_XLM = 1;
 const MAX_XLM = 50;
@@ -33,7 +38,7 @@ export default function PresaleClient() {
       let arch = 0;
       let xlm = 0;
       for (const b of j.balances ?? []) {
-        if (b.asset_code === "ARCHIVUM") arch = parseFloat(b.balance);
+        if (b.asset_code === ASSET_CODE) arch = parseFloat(b.balance);
         if (b.asset_type === "native") xlm = parseFloat(b.balance) - 19990; // aprox. reserva
       }
       setStats({ arch, xlm: Math.max(0, xlm) });
