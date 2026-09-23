@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import ReferralCapture from "@/components/ReferralBox";
+import TranslateWidget from "@/components/TranslateWidget";
 import Link from "next/link";
 
 const display = Cormorant_Garamond({
@@ -111,6 +112,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ARCHIVUM © 2026 — THE ARCHIVE REMEMBERS
             </p>
             <div className="flex items-center gap-5 font-mono text-[10px] tracking-dossier text-ash">
+              <TranslateWidget />
               <a
                 href="https://nostr.com/npub18eqze4e5xn20pql4e0ul3gxm25shmpg32cvzarzyl8nnguvwpeeszrycjx"
                 target="_blank"

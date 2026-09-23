@@ -95,16 +95,16 @@ export default function PacksClient() {
       const r = await requestAccess();
       setWallet(r.address);
       await loadUser(r.address);
-      setStatus("Carteira conectada. O Arquivo reconhece você.");
+      setStatus("Wallet connected. The Archive recognizes you.");
     } catch {
-      setStatus("Acesso negado. A porta permanece trancada.");
+      setStatus("Access denied. The door stays locked.");
     }
   };
 
   const openPack = async () => {
     if (!wallet) return;
     setPhase("opening");
-    setStatus("Assinando a queima…");
+    setStatus("Signing the burn…");
     try {
       const StellarSdk = await import("stellar-sdk");
       const server = new StellarSdk.Horizon.Server(HORIZON);
@@ -120,7 +120,7 @@ export default function PacksClient() {
         .setTimeout(180)
         .build();
       const signed = await signTransaction(tx.toXDR(), { networkPassphrase: NETWORK_PASSPHRASE });
-      setStatus("Selando no ledger…");
+      setStatus("Sealing to the ledger…");
       const result = await server.submitTransaction(
         StellarSdk.TransactionBuilder.fromXDR(signed.signedTxXdr, NETWORK_PASSPHRASE)
       );
@@ -135,8 +135,8 @@ export default function PacksClient() {
       setPhase("idle");
       setStatus(
         e?.message?.toLowerCase?.().includes("cancel")
-          ? "Transação recusada. O Arquivo aguarda."
-          : "Falha na abertura. Tente novamente."
+          ? "Transaction declined. The Archive waits."
+          : "Opening failed. Please try again."
       );
     }
   };
@@ -151,21 +151,47 @@ export default function PacksClient() {
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
       <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#8a8578]">
-        {NETWORK === "testnet" ? "Testnet — protótipo" : "Live — rede principal"}
+        {NETWORK === "testnet" ? "Testnet — prototype" : "Live — Stellar mainnet"}
       </p>
-      <h1 className="mt-3 font-serif text-5xl text-[#e8e4da]">Abrir um Pack</h1>
+      <h1 className="mt-3 font-serif text-5xl text-[#e8e4da]">Open a Pack</h1>
       <p className="mt-4 max-w-xl text-[#a8a396]">
-        Cada pack custa <span className="text-[#c9a227]">{PACK_PRICE} ${ASSET_CODE}</span>,
-        queimados para sempre. Cinco cartas saem do selo — e o hash da sua transação é a
-        semente do sorteio. Publicamos as odds. O ledger é o árbitro. Ninguém pode manipular.
+        Each pack costs <span className="text-[#c9a227]">{PACK_PRICE} ${ASSET_CODE}</span>,
+        burned forever. Five cards emerge from the seal — and your transaction hash is the
+        randomness seed. We publish the odds. The ledger is the arbiter. Nobody can rig the
+        draw.
       </p>
+
+      {/* GUIDED TOUR — shown until a wallet is connected */}
+      {!wallet && (
+        <div className="mt-8 border border-[#2a2a2c] p-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#c9a227]">
+            How it works — 3 steps
+          </p>
+          <ol className="mt-4 space-y-3 font-mono text-[11px] leading-relaxed text-[#a8a396] list-none">
+            <li>
+              <span className="text-[#c9a227]">STEP 1 — GET $ARCH.</span> Join the{" "}
+              <a href="/presale" className="underline underline-offset-4 text-[#e8e4da]">presale</a>{" "}
+              (1 XLM = 500 $ARCH, delivered automatically) or receive it from another cataloguer.
+            </li>
+            <li>
+              <span className="text-[#c9a227]">STEP 2 — CONNECT.</span> Use the Freighter wallet
+              (freighter.app, Public network). Your key is your account — no signup.
+            </li>
+            <li>
+              <span className="text-[#c9a227]">STEP 3 — BURN & REVEAL.</span> Sign the 100 $ARCH
+              burn. Five cards are drawn from your transaction hash — epic guaranteed every 15
+              packs, legendary every 60.
+            </li>
+          </ol>
+        </div>
+      )}
 
       {!wallet ? (
         <button
           onClick={connect}
           className="mt-10 border border-[#c9a227] px-8 py-4 font-mono text-sm uppercase tracking-widest text-[#c9a227] transition-colors hover:bg-[#c9a227] hover:text-black"
         >
-          Conectar Freighter
+          Connect Freighter
         </button>
       ) : (
         <div className="mt-10 flex flex-wrap items-center gap-6">
@@ -183,14 +209,14 @@ export default function PacksClient() {
             disabled={phase === "opening" || (balance ?? 0) < parseInt(PACK_PRICE)}
             className="border border-[#c9a227] bg-[#c9a227] px-8 py-4 font-mono text-sm uppercase tracking-widest text-black transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
           >
-            {phase === "opening" ? "Selando…" : "Queimar e revelar"}
+            {phase === "opening" ? "Sealing…" : "Burn & reveal"}
           </button>
           {(balance ?? 0) < parseInt(PACK_PRICE) && (
             <a
               href="/presale"
               className="font-mono text-xs uppercase tracking-widest text-[#8a8578] underline"
             >
-              Saldo insuficiente — pré-venda
+              Not enough $ARCH — join the presale
             </a>
           )}
         </div>
@@ -201,7 +227,7 @@ export default function PacksClient() {
         {phase === "reveal" && revealed.length > 0 && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-16">
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#c9a227]">
-              O ledger revelou
+              The ledger reveals
             </p>
             <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
               {revealed.map((c, i) => (
@@ -238,7 +264,7 @@ export default function PacksClient() {
                 }}
                 className="border border-[#2a2a2c] px-6 py-3 font-mono text-xs uppercase tracking-widest text-[#a8a396] hover:border-[#c9a227] hover:text-[#c9a227]"
               >
-                Abrir outro
+                Open another
               </button>
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`}
@@ -246,7 +272,7 @@ export default function PacksClient() {
                 rel="noreferrer"
                 className="border border-[#2a2a2c] px-6 py-3 font-mono text-xs uppercase tracking-widest text-[#a8a396] hover:border-[#c9a227] hover:text-[#c9a227]"
               >
-                Compartilhar no X
+                Share on X
               </a>
             </div>
           </motion.div>
@@ -256,7 +282,7 @@ export default function PacksClient() {
       {wallet && (
         <div className="mt-20">
           <p className="font-mono text-xs uppercase tracking-[0.3em] text-[#8a8578]">
-            Coleção — {owned.size}/{ALL_CARDS.length} arquivos ·{" "}
+            Collection — {owned.size}/{ALL_CARDS.length} files ·{" "}
             {Array.from(owned.values()).reduce((s, n) => s + n, 0)} cartas
           </p>
           <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">

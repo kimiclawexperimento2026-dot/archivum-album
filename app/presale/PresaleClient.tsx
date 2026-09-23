@@ -12,20 +12,20 @@ import {
   ASSET_CODE,
   DISTRIBUTION,
   HORIZON,
-  ISSUER,
   NETWORK,
   NETWORK_PASSPHRASE,
 } from "../../lib/archivum";
 
 const PRESALE_ADDR = DISTRIBUTION;
-const RATE = 500; // ARCH por XLM (mainnet — ao vivo)
+const RATE = 500; // ARCH per XLM — fixed, published, immutable
 const MIN_XLM = 1;
 const MAX_XLM = 50;
+const PRESALE_CAP = 25_000_000; // hard cap on total presale issuance
 
-type Stats = { arch: number; xlm: number };
+type Stats = { issued: number; alive: boolean };
 
 export default function PresaleClient() {
-  const [stats, setStats] = useState<Stats>({ arch: 0, xlm: 0 });
+  const [stats, setStats] = useState<Stats>({ issued: 0, alive: false });
   const [amount, setAmount] = useState("10");
   const [wallet, setWallet] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("");
@@ -35,17 +35,20 @@ export default function PresaleClient() {
   const loadStats = useCallback(async () => {
     try {
       const r = await fetch(`${HORIZON}/accounts/${PRESALE_ADDR}`);
+      if (!r.ok) {
+        setStats({ issued: 0, alive: false });
+        return;
+      }
       const j = await r.json();
       let arch = 0;
-      let xlm = 0;
       for (const b of j.balances ?? []) {
-        if (b.asset_code === ASSET_CODE) arch = parseFloat(b.balance);
-        if (b.asset_type === "native") xlm = parseFloat(b.balance) - 19990; // aprox. reserva
+        if (b.asset_code === ASSET_CODE) arch = parseFloat(b.balance); // issuer holds negative = issued so far
       }
-      setStats({ arch, xlm: Math.max(0, xlm) });
-      setSoldOut(arch < RATE * MIN_XLM);
+      const issued = arch < 0 ? -arch : 0;
+      setStats({ issued, alive: true });
+      setSoldOut(issued >= PRESALE_CAP);
     } catch {
-      /* horizon indisponível — mantém último valor */
+      /* horizon unavailable — keep last known values */
     }
   }, []);
 
@@ -57,7 +60,7 @@ export default function PresaleClient() {
 
   useEffect(() => {
     freighterIsConnected().then((r) => {
-      if (r.isConnected) setStatus("Freighter detectada. Conecte para comprar.");
+      if (r.isConnected) setStatus("Freighter detected. Connect to buy.");
     });
   }, []);
 
@@ -66,25 +69,25 @@ export default function PresaleClient() {
       const r = await requestAccess();
       if (r && r.address) {
         setWallet(r.address);
-        setStatus("Carteira conectada.");
+        setStatus("Wallet connected.");
       }
     } catch {
-      setStatus("Freighter não encontrado — instale em freighter.app e ative a rede TESTNET.");
+      setStatus("Freighter not found — install it at freighter.app and set the network to PUBLIC.");
     }
   };
 
   const buy = async () => {
     const xlm = parseFloat(amount);
     if (isNaN(xlm) || xlm < MIN_XLM || xlm > MAX_XLM) {
-      setStatus(`Valor inválido. Mín ${MIN_XLM} XLM, máx ${MAX_XLM} XLM.`);
+      setStatus(`Invalid amount. Min ${MIN_XLM} XLM, max ${MAX_XLM} XLM per purchase.`);
       return;
     }
     if (!wallet) {
-      setStatus("Conecte a carteira primeiro.");
+      setStatus("Connect your wallet first.");
       return;
     }
     setBusy(true);
-    setStatus("Construindo transação...");
+    setStatus("Building the transaction...");
     try {
       const StellarSdk = await import("stellar-sdk");
       const server = new StellarSdk.Horizon.Server(HORIZON);
@@ -103,23 +106,25 @@ export default function PresaleClient() {
         .addMemo(StellarSdk.Memo.text("ARCHIVUM PRESALE"))
         .setTimeout(30)
         .build();
-      setStatus("Assine na extensão Freighter...");
+      setStatus("Sign in the Freighter extension...");
       const signed = await signTransaction(tx.toXDR(), {
         networkPassphrase: NETWORK_PASSPHRASE,
       });
-      if (!signed || signed.error) throw new Error(signed?.error || "assinatura recusada");
-      setStatus("Enviando para a blockchain...");
+      if (!signed || signed.error) throw new Error(signed?.error || "signature declined");
+      setStatus("Broadcasting to the blockchain...");
       const res = await fetch(`${HORIZON}/transactions`, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `tx=${encodeURIComponent(signed.signedTxXdr)}`,
       });
       const j = await res.json();
-      if (!res.ok) throw new Error(j.detail || "falha no envio");
-      setStatus(`✓ Enviado! ${xlm} XLM a caminho — ${(xlm * RATE).toLocaleString("en-US")} $ARCH chegam automaticamente em segundos.`);
+      if (!res.ok) throw new Error(j.detail || "submission failed");
+      setStatus(
+        `✓ Sent! ${xlm} XLM received — ${(xlm * RATE).toLocaleString("en-US")} $ARCH are minted and delivered to your wallet automatically within seconds.`
+      );
       setTimeout(loadStats, 12000);
     } catch (e: unknown) {
-      setStatus(`Erro: ${e instanceof Error ? e.message : String(e)}`);
+      setStatus(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setBusy(false);
     }
@@ -130,63 +135,101 @@ export default function PresaleClient() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-16">
       <p className="text-[10px] uppercase tracking-[0.35em] text-gold/80">
-        Fase 2 — Demonstração TESTNET
+        Live on Stellar mainnet
       </p>
       <h1
         className="mt-3 text-4xl sm:text-5xl text-bone"
         style={{ fontFamily: "var(--font-display), serif" }}
       >
-        Pré-venda <span className="text-gold">$ARCH</span>
+        $ARCH Presale
       </h1>
       <p className="mt-4 text-sm text-bone/60 leading-relaxed">
-        Sem cadastro. Sem Stripe. Sem intermediário. Você envia XLM para o endereço-contrato e o
-        watcher entrega seus tokens <em className="text-bone/80">automaticamente</em> — em até 15
-        segundos. Ninguém toca nos fundos no caminho.
+        No signup. No card. No middleman. You send XLM to the contract address below and the
+        watcher delivers your tokens <em className="text-bone/80">automatically</em> — usually
+        within 30 seconds. Tokens are minted at purchase, so supply can never exceed the cap.
       </p>
 
-      <div className="mt-8 grid grid-cols-2 gap-3">
+      {/* GUIDED TOUR — what this screen is and how to use it */}
+      <details className="dossier mt-8 p-5 group">
+        <summary className="cursor-pointer text-[10px] tracking-[0.3em] text-gold select-none">
+          ▸ NEW HERE? HOW THE PRESALE WORKS — 3 STEPS
+        </summary>
+        <ol className="mt-4 space-y-3 text-xs leading-relaxed text-bone/70 list-none">
+          <li>
+            <span className="text-gold font-mono">STEP 1 — WALLET.</span> Install the Freighter
+            browser extension (freighter.app) and switch it to the{" "}
+            <span className="text-bone">PUBLIC network</span>. This is your account: no email, no
+            password, your key is your identity.
+          </li>
+          <li>
+            <span className="text-gold font-mono">STEP 2 — TRUSTLINE.</span> Add the{" "}
+            <span className="text-bone">$ARCH</span> asset to Freighter so it can receive tokens:
+            Freighter → Add Asset → code <span className="text-bone">ARCHIVUM</span>, issuer{" "}
+            <span className="font-mono text-bone/80 break-all">{PRESALE_ADDR.slice(0, 24)}…</span>
+          </li>
+          <li>
+            <span className="text-gold font-mono">STEP 3 — SEND.</span> Enter an amount (1–50 XLM),
+            connect, and sign. The fixed rate is{" "}
+            <span className="text-bone">1 XLM = 500 $ARCH</span>. Delivery is automatic — you will
+            see the tokens in Freighter within seconds.
+          </li>
+        </ol>
+        <p className="mt-4 border-t border-bone/10 pt-3 text-[10px] leading-relaxed text-bone/40">
+          WHAT IS $ARCH? The utility token of the ARCHIVUM bestiary. It buys sealed creature packs
+          (100 $ARCH per pack, burned forever), and anchors future Archive mechanics. Fully
+          auditable on the Stellar ledger.
+        </p>
+      </details>
+
+      <div className="mt-6 grid grid-cols-2 gap-3">
         <div className="dossier p-4">
-          <div className="text-[9px] tracking-[0.25em] text-bone/40">INVENTÁRIO DISPONÍVEL</div>
+          <div className="text-[9px] tracking-[0.25em] text-bone/40">ISSUED SO FAR</div>
           <div className="mt-2 font-mono text-2xl text-gold">
-            {stats.arch.toLocaleString("en-US")}
+            {stats.issued.toLocaleString("en-US")}
           </div>
-          <div className="text-[10px] font-mono text-bone/40">$ARCH restantes</div>
+          <div className="text-[10px] font-mono text-bone/40">
+            of {PRESALE_CAP.toLocaleString("en-US")} $ARCH cap
+          </div>
         </div>
         <div className="dossier p-4">
-          <div className="text-[9px] tracking-[0.25em] text-bone/40">TAXA FIXA</div>
+          <div className="text-[9px] tracking-[0.25em] text-bone/40">FIXED RATE</div>
           <div className="mt-2 font-mono text-2xl text-bone">
             1 <span className="text-bone/40">XLM</span> = {RATE}{" "}
             <span className="text-bone/40">$ARCH</span>
           </div>
-          <div className="text-[10px] font-mono text-bone/40">mín {MIN_XLM} · máx {MAX_XLM} XLM</div>
+          <div className="text-[10px] font-mono text-bone/40">
+            min {MIN_XLM} · max {MAX_XLM} XLM per purchase
+          </div>
         </div>
       </div>
 
       <div className="dossier mt-6 p-5">
-        <div className="text-[9px] tracking-[0.25em] text-bone/40">ENDEREÇO-CONTRATO DA PRÉ-VENDA</div>
+        <div className="text-[9px] tracking-[0.25em] text-bone/40">
+          PRESALE CONTRACT ADDRESS
+        </div>
         <div className="mt-2 break-all font-mono text-xs text-bone/80">{PRESALE_ADDR}</div>
         <button
           onClick={() => navigator.clipboard.writeText(PRESALE_ADDR)}
           className="mt-3 border border-gold/40 px-3 py-1 text-[10px] tracking-[0.2em] text-gold hover:bg-gold hover:text-void transition-colors"
         >
-          COPIAR ENDEREÇO
+          COPY ADDRESS
         </button>
       </div>
 
       <div className="dossier mt-6 p-5">
         {wallet ? (
           <p className="text-[11px] font-mono text-bone/60">
-            CARTEIRA: <span className="text-gold">{wallet.slice(0, 12)}…{wallet.slice(-6)}</span>
+            WALLET: <span className="text-gold">{wallet.slice(0, 12)}…{wallet.slice(-6)}</span>
           </p>
         ) : (
           <p className="text-[11px] font-mono text-bone/40">
-            Carteira não conectada — Freighter (TESTNET) necessária.
+            Wallet not connected — Freighter (Public network) required.
           </p>
         )}
 
         <div className="mt-4 flex items-end gap-3">
           <label className="block flex-1">
-            <span className="text-[9px] tracking-[0.25em] text-bone/40">QUANTIDADE (XLM)</span>
+            <span className="text-[9px] tracking-[0.25em] text-bone/40">AMOUNT (XLM)</span>
             <input
               type="number"
               min={MIN_XLM}
@@ -208,7 +251,7 @@ export default function PresaleClient() {
               onClick={connect}
               className="flex-1 border border-gold px-4 py-3 text-xs tracking-[0.25em] text-gold hover:bg-gold hover:text-void transition-colors"
             >
-              CONECTAR CARTEIRA
+              CONNECT WALLET
             </button>
           ) : (
             <button
@@ -216,7 +259,7 @@ export default function PresaleClient() {
               disabled={busy || soldOut}
               className="flex-1 bg-gold px-4 py-3 text-xs tracking-[0.25em] text-void hover:opacity-90 transition-opacity disabled:opacity-40"
             >
-              {soldOut ? "INVENTÁRIO ESGOTADO" : busy ? "PROCESSANDO..." : "COMPRAR $ARCH"}
+              {soldOut ? "PRESALE CAP REACHED" : busy ? "PROCESSING..." : "BUY $ARCH"}
             </button>
           )}
         </div>
@@ -229,23 +272,22 @@ export default function PresaleClient() {
       </div>
 
       <div className="mt-6 border border-bone/10 p-4 text-[11px] leading-relaxed text-bone/40">
-        <span className="text-bone/60">⚠ TESTNET —</span> tokens sem valor real. Este é o protótipo
-        do contrato-espécie de pré-venda: na mainnet, o mesmo fluxo roda com USDC reais, taxa e
-        endereço auditáveis, e inventário travado por contrato. Explorador:{" "}
+        <span className="text-bone/60">Before you send:</span> verify this address on the public
+        ledger —{" "}
         <a
           href={`https://stellar.expert/explorer/${NETWORK}/account/${PRESALE_ADDR}`}
           target="_blank"
           rel="noreferrer"
           className="text-gold/80 underline underline-offset-4"
         >
-          ver endereço no StellarExpert
+          inspect it on StellarExpert
         </a>
-        .
+        . Deliveries are fully automatic. Never trust any other address claiming to sell $ARCH.
       </div>
 
       <div className="mt-8 flex gap-6 text-[10px] tracking-[0.25em] text-bone/40">
-        <Link href="/" className="hover:text-bone">← VOLTAR</Link>
-        <Link href="/album" className="hover:text-bone">ÁLBUM</Link>
+        <Link href="/" className="hover:text-bone">← BACK</Link>
+        <Link href="/album" className="hover:text-bone">ALBUM</Link>
         <Link href="/packs" className="hover:text-bone">PACKS</Link>
       </div>
     </main>
