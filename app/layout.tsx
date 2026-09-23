@@ -106,7 +106,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </p>
             <div className="flex items-center gap-5 font-mono text-[10px] tracking-dossier text-ash">
               <a
-                href="https://nostr.com/npub18eqzec2m6x9rv7yerzs7wm06lsx9y9vxgtza9j4em0l6e9ztq4vskn7lk7"
+                href="https://nostr.com/npub18eqze4e5xn20pql4e0ul3gxm25shmpg32cvzarzyl8nnguvwpeeszrycjx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-gold"
