@@ -1,0 +1,15 @@
+# ARCHIVUM — organização oficial do ativo (descoberta via home_domain)
+ORG_NAME = "ARCHIVUM"
+ORG_URL = "https://archivum-album.vercel.app"
+ORG_DESCRIPTION = "O arquivo das criaturas que o mundo esqueceu. Figurinhas bestiário com lore verificável, packs auditáveis e pré-venda automática na Stellar."
+
+[[CURRENCIES]]
+code = "ARCHIVUM"
+issuer = "GCU72VRE26KQGSO7BXDGUWPL3JNP7CZ6HV7EELULALURHJGSHJBT4XQU"
+display_decimals = 7
+name = "ARCHIVUM"
+desc = "Token de utilidade do bestiário ARCHIVUM: compra de packs de figurinhas (queima de 100 ARCH/pack), governança do acervo e acesso a drops. Supply máximo 50B; pré-venda com cap de 25M ARCH."
+image = "https://archivum-album.vercel.app/emblem.svg"
+anchor_asset_type = "crypto"
+anchor_asset = "XLM"
+redemption_instructions = "https://archivum-album.vercel.app/packs"
