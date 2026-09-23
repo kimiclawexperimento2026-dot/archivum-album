@@ -3,7 +3,7 @@
 
 export type NetworkName = "testnet" | "mainnet";
 
-export const NETWORK: NetworkName = "testnet" as NetworkName; // flip commit → "mainnet"
+export const NETWORK: NetworkName = "mainnet" as NetworkName; // MAINNET LIVE desde 2026-09-24
 
 export const HORIZON =
   NETWORK === "mainnet"
@@ -15,11 +15,10 @@ export const NETWORK_PASSPHRASE =
     ? "Public Global Stellar Network ; September 2015"
     : "Test SDF Network ; September 2015";
 
-// Distribuidora: MESMA keypair nas duas redes — o endereço já é válido no mainnet,
-// aguardando funding (~25 XLM) para ativação automática das vendas reais.
+// Distribuidora = EMISSORA no mainnet (auto-emissão na venda — mesma keypair
+// do cofre da pré-venda, scripts/config_presale.json). Chaves travadas fora do repo.
 export const DISTRIBUTION = "GCU72VRE26KQGSO7BXDGUWPL3JNP7CZ6HV7EELULALURHJGSHJBT4XQU";
-// Emissor testnet. No flip mainnet: gerar keypair novo, emitir supply e travar.
-export const ISSUER = "GDCCEQKHW2SWHOMP4MZSB3DIWSSF7CFUL6JKCTHTY2AO4MWHLLYBDAMR";
+export const ISSUER = DISTRIBUTION; // mainnet: o cofre emite (mint na venda)
 export const ASSET_CODE = "ARCHIVUM";
 export const PACK_PRICE = "100"; // ARCH queimados por pack (5 cartas)
 

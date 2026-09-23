@@ -13,11 +13,12 @@ import {
   DISTRIBUTION,
   HORIZON,
   ISSUER,
+  NETWORK,
   NETWORK_PASSPHRASE,
 } from "../../lib/archivum";
 
 const PRESALE_ADDR = DISTRIBUTION;
-const RATE = 500; // ARCH por XLM (testnet)
+const RATE = 500; // ARCH por XLM (mainnet — ao vivo)
 const MIN_XLM = 1;
 const MAX_XLM = 50;
 
@@ -232,7 +233,7 @@ export default function PresaleClient() {
         do contrato-espécie de pré-venda: na mainnet, o mesmo fluxo roda com USDC reais, taxa e
         endereço auditáveis, e inventário travado por contrato. Explorador:{" "}
         <a
-          href={`https://stellar.expert/explorer/testnet/account/${PRESALE_ADDR}`}
+          href={`https://stellar.expert/explorer/${NETWORK}/account/${PRESALE_ADDR}`}
           target="_blank"
           rel="noreferrer"
           className="text-gold/80 underline underline-offset-4"
