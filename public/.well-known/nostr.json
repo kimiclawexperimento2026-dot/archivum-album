@@ -1,0 +1,12 @@
+{
+  "names": {
+    "archivum": "3e402cd73434d4f083f5cbf9f8a0db55217d851156182e8c44f9e734718e0e73"
+  },
+  "relays": {
+    "3e402cd73434d4f083f5cbf9f8a0db55217d851156182e8c44f9e734718e0e73": [
+      "wss://relay.damus.io",
+      "wss://nos.lol",
+      "wss://relay.nostr.band"
+    ]
+  }
+}

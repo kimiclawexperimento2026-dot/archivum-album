@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C9A227" stop-opacity="0.16"/>
+      <stop offset="70%" stop-color="#C9A227" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#C9A227" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="256" cy="256" r="250" fill="url(#glow)"/>
+
+  <!-- outer rings -->
+  <circle cx="256" cy="256" r="236" stroke="#C9A227" stroke-width="2" opacity="0.9"/>
+  <circle cx="256" cy="256" r="226" stroke="#C9A227" stroke-width="1" opacity="0.35"/>
+
+  <!-- tick ring (astronomical instrument) -->
+  <g stroke="#C9A227" opacity="0.8">
+    <line x1="256" y1="18" x2="256" y2="34" stroke-width="2"/>
+    <line x1="256" y1="478" x2="256" y2="494" stroke-width="2"/>
+    <line x1="18" y1="256" x2="34" y2="256" stroke-width="2"/>
+    <line x1="478" y1="256" x2="494" y2="256" stroke-width="2"/>
+  </g>
+  <g stroke="#C9A227" stroke-width="1.4" opacity="0.55">
+    <line x1="372.3" y1="47.7" x2="363.3" y2="62.3"/>
+    <line x1="464.3" y1="139.7" x2="449.7" y2="148.7"/>
+    <line x1="464.3" y1="372.3" x2="449.7" y2="363.3"/>
+    <line x1="372.3" y1="464.3" x2="363.3" y2="449.7"/>
+    <line x1="139.7" y1="464.3" x2="148.7" y2="449.7"/>
+    <line x1="47.7" y1="372.3" x2="62.3" y2="363.3"/>
+    <line x1="47.7" y1="139.7" x2="62.3" y2="148.7"/>
+    <line x1="139.7" y1="47.7" x2="148.7" y2="62.3"/>
+  </g>
+  <g stroke="#C9A227" stroke-width="1" opacity="0.35">
+    <line x1="303" y1="25.5" x2="299" y2="41"/>
+    <line x1="428.5" y1="89" x2="418.5" y2="101.5"/>
+    <line x1="486.5" y1="209" x2="471" y2="213"/>
+    <line x1="486.5" y1="303" x2="471" y2="299"/>
+    <line x1="428.5" y1="423" x2="418.5" y2="410.5"/>
+    <line x1="303" y1="486.5" x2="299" y2="471"/>
+    <line x1="209" y1="486.5" x2="213" y2="471"/>
+    <line x1="83.5" y1="423" x2="93.5" y2="410.5"/>
+    <line x1="25.5" y1="303" x2="41" y2="299"/>
+    <line x1="25.5" y1="209" x2="41" y2="213"/>
+    <line x1="83.5" y1="89" x2="93.5" y2="101.5"/>
+    <line x1="209" y1="25.5" x2="213" y2="41"/>
+  </g>
+
+  <!-- ouroboros: body circle with gap, head biting tail -->
+  <path d="M 256 72 A 184 184 0 1 1 91 176" stroke="#C9A227" stroke-width="10" stroke-linecap="round"/>
+  <path d="M 96 152 L 68 176 L 102 192 Z" fill="#C9A227"/>
+  <circle cx="88" cy="172" r="4" fill="#0A0908"/>
+  <!-- tail tapering into mouth -->
+  <path d="M 256 72 C 230 62, 200 60, 172 66 C 140 73, 112 88, 96 152" stroke="#C9A227" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"/>
+
+  <!-- inner seal -->
+  <circle cx="256" cy="256" r="128" stroke="#C9A227" stroke-width="1.5" opacity="0.5"/>
+  <circle cx="256" cy="256" r="120" stroke="#C9A227" stroke-width="1" opacity="0.25"/>
+
+  <!-- the closed eye -->
+  <path d="M 176 256 Q 256 190 336 256 Q 256 322 176 256 Z" stroke="#E8E3D9" stroke-width="4" fill="none"/>
+  <circle cx="256" cy="256" r="26" stroke="#E8E3D9" stroke-width="3.5" fill="none"/>
+  <circle cx="256" cy="256" r="9" fill="#C9A227"/>
+  <line x1="256" y1="282" x2="256" y2="296" stroke="#E8E3D9" stroke-width="2" opacity="0.5"/>
+
+  <!-- file ticks -->
+  <g stroke="#C9A227" stroke-width="1" opacity="0.4">
+    <line x1="216" y1="352" x2="216" y2="360"/>
+    <line x1="232" y1="352" x2="232" y2="364"/>
+    <line x1="248" y1="352" x2="248" y2="360"/>
+    <line x1="264" y1="352" x2="264" y2="364"/>
+    <line x1="280" y1="352" x2="280" y2="360"/>
+    <line x1="296" y1="352" x2="296" y2="364"/>
+  </g>
+</svg>

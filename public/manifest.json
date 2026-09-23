@@ -1,0 +1,10 @@
+{
+  "name": "ARCHIVUM — The Creature Archive",
+  "short_name": "ARCHIVUM",
+  "description": "Contain the creatures. Every mythology kept the same files.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0908",
+  "theme_color": "#0A0908",
+  "icons": []
+}
