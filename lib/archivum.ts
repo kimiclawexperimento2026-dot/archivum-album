@@ -23,17 +23,17 @@ export const ISSUER = "GDCCEQKHW2SWHOMP4MZSB3DIWSSF7CFUL6JKCTHTY2AO4MWHLLYBDAMR"
 export const ASSET_CODE = "ARCHIVUM";
 export const PACK_PRICE = "100"; // ARCH queimados por pack (5 cartas)
 
-// Arte dos cards tipográficos (001-010). Demais ids usam o emblema.
+// Arte das pranchas gravadas (bestiário xilogravado, gerado por plate_gen.py)
 export const CARD_ART: Record<string, string> = {
-  "001": "/cards/001_the-star-devourer.png",
-  "002": "/cards/002_the-eternal-winter.png",
-  "003": "/cards/003_the-primordial-chaos.png",
-  "004": "/cards/004_the-feathered-serpent.png",
-  "005": "/cards/005_the-earth-titan.png",
-  "006": "/cards/006_the-three-headed-venom.png",
-  "007": "/cards/007_the-world-serpent.png",
-  "008": "/cards/008_the-sea-storm.png",
-  "009": "/cards/009_the-star-of-darkness.png",
-  "010": "/cards/010_the-abyssal-leviathan.png",
+  "001": "/plates/001_the-star-devourer.svg",
+  "002": "/plates/002_the-eternal-winter.svg",
+  "003": "/plates/003_the-primordial-chaos.svg",
+  "004": "/plates/004_the-feathered-serpent.svg",
+  "005": "/plates/005_the-earth-titan.svg",
+  "006": "/plates/006_the-three-headed-venom.svg",
+  "007": "/plates/007_the-world-serpent.svg",
+  "008": "/plates/008_the-sea-storm.svg",
+  "009": "/plates/009_the-star-of-darkness.svg",
+  "010": "/plates/010_the-abyssal-leviathan.svg",
 };
 export const cardArt = (id: string): string => CARD_ART[id] ?? "/emblem.svg";
